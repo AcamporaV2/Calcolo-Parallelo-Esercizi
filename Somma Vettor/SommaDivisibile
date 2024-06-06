@@ -3,7 +3,7 @@
 #include <omp.h>
 #include <time.h>
 
-//Somma 2 vettori dove N è divisibile per t
+//Somma 2 vettori caso dove N è divisibile per t
 
 void  stampaVettore(float*, int, char[]);
 
