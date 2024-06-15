@@ -30,9 +30,7 @@ int main()
     
     double tempo_inizio, tempo_fine;
 
-
     srand(time(NULL));
-
     printf("Inserisci numero righe N:");
     scanf("%d", &N);
 
@@ -55,22 +53,25 @@ int main()
 
 
     //punto 2 e 3 uniti
-    #pragma omp parallel for shared(Matrice,Vettore) private (j) num_threads(Num_core)
-    for (int id_thread = 0; id_thread < Num_core; id_thread++)
+    #pragma omp parallel  shared(Matrice,Vettore) private (j) num_threads(Num_core)
     {
+        int id_thread = omp_get_thread_num();
+
         if (id_thread < N)
         {
             int somma_elementi = 0;
             for (j = 0; j < M; j++)
             {
-                somma_elementi += Matrice[id_thread][j];
+                somma_elementi = somma_elementi + Matrice[id_thread][j];
             }
-            Vettore[id_thread] = somma_elementi;
+
+            Vettore[id_thread]= somma_elementi;
+        } else {
+
+            printf("0");
         }
-        else
-        {
-            Vettore[id_thread] = 0; // Se id
-        }
+
+
     }
 
     // Stampa del vettore c
@@ -82,7 +83,7 @@ int main()
     printf("\n");
 
     int max_valore = Vettore[0];
-    #pragma omp parallelfor shared(Vettore) private (i)  reduction(max:max_valore) 
+    #pragma omp parallelfor shared(Vettore) private (i)  reduction(max:max_valore) num_threads(Num_core)
     {
         for (int i = 1; i < Num_core; i++) 
         {
