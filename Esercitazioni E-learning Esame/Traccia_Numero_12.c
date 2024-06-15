@@ -13,7 +13,7 @@ Il programma deve essere organizzato come segue:
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
-
+#include <time.h>
 void allocationMatrix(int***, int, int);
 void fillMatrix(int***, int, int);
 void printMatrix(int**, int, int, char[]);
@@ -29,6 +29,9 @@ int main()
     int i, j; 
     
     double tempo_inizio, tempo_fine;
+
+
+    srand(time(NULL));
 
     printf("Inserisci numero righe N:");
     scanf("%d", &N);
@@ -52,28 +55,28 @@ int main()
 
 
     //punto 2 e 3 uniti
-    #pragma omp parallel shared(Matrice,Vettore) private (j) num_threads(Num_core)
+    #pragma omp parallel for shared(Matrice,Vettore) private (j) num_threads(Num_core)
+    for (int id_thread = 0; id_thread < Num_core; id_thread++)
     {
-        int id_thread = omp_get_thread_num();
-       
-
         if (id_thread < N)
         {
             int somma_elementi = 0;
             for (j = 0; j < M; j++)
             {
-                somma_elementi = somma_elementi + Matrice[id_thread][j];
+                somma_elementi += Matrice[id_thread][j];
             }
-
-            Vettore[id_thread]= somma_elementi;
+            Vettore[id_thread] = somma_elementi;
         }
-
-
+        else
+        {
+            Vettore[id_thread] = 0; // Se id
+        }
     }
 
-     // Stampa del vettore c
+    // Stampa del vettore c
     printf("\nVettore c:\n");
-    for (int i = 0; i < Num_core; i++) {
+    for (int i = 0; i < Num_core; i++) 
+    {
         printf("%d ", Vettore[i]);
     }
     printf("\n");
@@ -105,7 +108,7 @@ int main()
 
 
 
-//FUNZIONI COSTRUZIONE MATRICE
+
 
 
 void allocationMatrix(int*** matrix, int N, int M) {
